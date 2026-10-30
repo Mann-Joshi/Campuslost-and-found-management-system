@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <title>Find It Dashboard</title>
+</head>
+<body>
+    <h1>Find It</h1>
+    <p>Logged in as {{ request.user.username }}</p>
+    <a href="{% url 'report' %}">Report an item</a>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+
+    <h2>Campus reports</h2>
+    {% for item in reports %}
+        <section>
+            <h3>{{ item.item_type }}: {{ item.name }}</h3>
+            <p>{{ item.description }}</p>
+            <p>Location: {{ item.location }}</p>
+            <p>Reported by {{ item.owner.username }}</p>
+            {% if item.owner_id == request.user.id %}
+                <a href="{% url 'edit' item.id %}">Edit</a>
+                <form method="post" action="{% url 'delete' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            {% endif %}
+        </section>
+    {% empty %}
+        <p>There are no reports yet.</p>
+    {% endfor %}
+</body>
+</html>
